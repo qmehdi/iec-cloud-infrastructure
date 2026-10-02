@@ -1,0 +1,15 @@
+# Terraform working files, and the state files Terraform keeps on your laptop.
+# State is a record of what you built in your own AWS account, so it never
+# belongs in git.
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfplan
+
+# Editors and OS clutter
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
