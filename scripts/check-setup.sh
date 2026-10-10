@@ -101,7 +101,7 @@ repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 if [ -d "$repo_root/scripts" ] && [ -f "$repo_root/README.md" ]; then
   ok "Course repo found at $repo_root"
 else
-  bad "Can't find the course files" "Run this from inside the cloud-devops-course folder"
+  bad "Can't find the course files" "Run this from inside the iec-cloud-infrastructure folder"
 fi
 
 echo

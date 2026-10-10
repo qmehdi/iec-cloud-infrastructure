@@ -18,7 +18,7 @@ Each step below has the same four parts:
 **Run:**
 
 ```bash
-cd ~/cloud-devops-course
+cd ~/iec-cloud-infrastructure
 git checkout step-01
 ./scripts/check-setup.sh
 ```
@@ -75,7 +75,7 @@ Type your email again, read the plan, then type `yes`.
 **Run:**
 
 ```bash
-cd ~/cloud-devops-course
+cd ~/iec-cloud-infrastructure
 git checkout step-03
 cd infra/01-network
 terraform init -backend-config=../backend.hcl
@@ -148,7 +148,7 @@ Read the list carefully: these are the things that will be deleted. Type `yes`.
 Now check your account:
 
 ```bash
-cd ~/cloud-devops-course
+cd ~/iec-cloud-infrastructure
 ./scripts/whats-running.sh
 ```
 

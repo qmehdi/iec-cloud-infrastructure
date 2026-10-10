@@ -63,8 +63,8 @@ git --version
 
 ```bash
 cd ~
-git clone https://github.com/qmehdi/cloud-devops-course.git
-cd cloud-devops-course
+git clone https://github.com/qmehdi/iec-cloud-infrastructure.git
+cd iec-cloud-infrastructure
 ```
 
 ## Sign in to AWS from your terminal

@@ -52,7 +52,7 @@ Analogy that works for beginners: the VPC is an office building. Public subnets 
 
 **Step 4: Terraform changes, it doesn't start over.** Point at `Plan: 8 to add, 0 to change, 0 to destroy`. Terraform compared the code to its state and only added what's new. That's the core of how infrastructure is managed at real companies.
 
-Show `private.tf` and the `enable_nat` variable. Tell them to remember it: in Week 4 they'll switch it off on purpose and watch what breaks.
+Show `private.tf` and the `enable_nat` variable. It's the escape hatch for accounts that refuse to create a NAT gateway, and the reason the course can carry on without one.
 
 **Step 5: teardown as a habit.** Every class ends with destroy plus `whats-running.sh`. Make it a ritual: nobody leaves until their screen says "Nothing billable running."
 
