@@ -3,7 +3,7 @@
 # Your database and app servers will live here in later weeks.
 #
 # Things in a private subnet still sometimes need to reach OUT to the
-# internet: to download software updates, or (in Week 4) to call the Yelp API.
+# internet: to download software updates, or (in Week 3) to call the Yelp API.
 # The NAT gateway is a one-way door for that: traffic can go out and the reply
 # comes back, but nobody on the internet can start a connection in.
 #
@@ -12,7 +12,7 @@
 # -----------------------------------------------------------------------------
 
 variable "enable_nat" {
-  description = "Create the NAT gateway. In Week 4 we turn this off on purpose to see what breaks."
+  description = "Create the NAT gateway. Set to false only if your AWS account refuses to create one."
   type        = bool
   default     = true
 }

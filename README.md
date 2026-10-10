@@ -26,15 +26,23 @@ git diff step-02 step-03
 |---|---|---|
 | 1 | Getting started: AWS account and console tour | (done in class) |
 | 2 | **Lay the foundation:** Terraform, a budget alarm, your own VPC and NAT gateway | `step-01` – `step-05` |
-| 3 | **Go live:** a PostgreSQL database and the app on its first server | coming soon |
-| 4 | **Scale it:** a load balancer and Auto Scaling | coming soon |
+| 3 | **Go live:** a managed database, a load balancer, and the app on its first server | `step-06` – `step-09` |
+| 4 | **Scale it:** more servers, self-healing and rolling updates | coming soon |
 | 5 | **Containerize:** Docker, ECR and ECS Fargate | coming soon |
 | 6 | **Automate it:** a GitHub Actions pipeline | coming soon |
 
 ## Start here
 
 1. Install the tools: [docs/00-setup.md](docs/00-setup.md)
-2. Follow this week's guide: [docs/week-2.md](docs/week-2.md)
+2. Follow this week's guide: [docs/week-3.md](docs/week-3.md)
+   (last week's is still here: [docs/week-2.md](docs/week-2.md))
+
+## The app
+
+From Week 3 on, this infrastructure runs **Neighborhood Eats**, a small restaurant
+review site. Its code lives in its own repository:
+[neighborhood-eats](https://github.com/qmehdi/neighborhood-eats). You don't need to
+touch it; your server installs a tagged release by itself.
 
 ## Keeping costs at zero
 
