@@ -1,0 +1,104 @@
+#!/bin/bash
+# -----------------------------------------------------------------------------
+# First-boot setup for the app server.
+#
+# AWS runs this script, as root, the first time this server starts. These are
+# the same commands you'd type by hand if you were setting up a web server
+# yourself: install software, fetch the app, write its settings, start it.
+#
+# Everything it prints goes to /var/log/user-data.log. If the site doesn't
+# come up, that's the first file to read:
+#
+#   sudo tail -100 /var/log/user-data.log
+# -----------------------------------------------------------------------------
+set -euo pipefail
+exec >>/var/log/user-data.log 2>&1
+set -x
+
+echo "=== Neighborhood Eats setup starting at $(date -u) ==="
+
+APP_DIR=/opt/neighborhood-eats
+ENV_FILE=/etc/neighborhood-eats.env
+
+# --- 1. Software -------------------------------------------------------------
+# python3.12 runs the app, nginx sits in front of it, git fetches the code.
+dnf -y install python3.12 python3.12-pip git nginx
+
+# --- 2. A user to run the app ------------------------------------------------
+# The app does not run as root. If it were ever broken into, the attacker
+# would land as "appuser", who owns almost nothing and cannot log in.
+if ! id -u appuser >/dev/null 2>&1; then
+  useradd --system --home-dir "$APP_DIR" --shell /sbin/nologin appuser
+fi
+
+# --- 3. The app itself -------------------------------------------------------
+# A PINNED tag, not the latest commit. Every student's server runs identical
+# code, and a change to the app repository can't alter a class in progress.
+rm -rf "$APP_DIR"
+git clone --depth 1 --branch "${app_version}" "${app_repo_url}" "$APP_DIR"
+
+# A virtual environment: the app's Python libraries, kept separate from the
+# system's, so neither can break the other.
+python3.12 -m venv "$APP_DIR/.venv"
+"$APP_DIR/.venv/bin/python" -m pip install --upgrade pip
+"$APP_DIR/.venv/bin/python" -m pip install -r "$APP_DIR/requirements.txt"
+
+# --- 4. Settings -------------------------------------------------------------
+# Note what IS here: where the database lives, and the NAMES of the secrets.
+# Note what is NOT here: the database password, and the Yelp key. The app
+# fetches those from Secrets Manager itself, using the role attached to this
+# server. No password has ever been written into a file by Terraform.
+cat > "$ENV_FILE" <<'ENVFILE'
+NE_REGION=${region}
+NE_DB_HOST=${db_host}
+NE_DB_PORT=${db_port}
+NE_DB_NAME=${db_name}
+NE_DB_SECRET_ID=${db_secret_arn}
+NE_YELP_SECRET_ID=${yelp_secret_arn}
+NE_SECRET_KEY=${flask_secret}
+ENVFILE
+
+# Readable by root and by appuser, and by nobody else.
+chmod 0640 "$ENV_FILE"
+chown root:appuser "$ENV_FILE"
+
+# --- 5. The service definitions ----------------------------------------------
+# Both of these come from the app repository, so the way the app is run is
+# versioned alongside the app itself.
+install -m 0644 "$APP_DIR/deploy/gunicorn.service" /etc/systemd/system/neighborhood-eats.service
+install -m 0644 "$APP_DIR/deploy/nginx.conf" /etc/nginx/nginx.conf
+
+chown -R appuser:appuser "$APP_DIR"
+chmod 0755 "$APP_DIR"
+
+# On a system with SELinux enforcing, nginx isn't allowed to open a network
+# connection (which is what talking to gunicorn is) until it's told it may.
+if command -v setsebool >/dev/null 2>&1; then
+  setsebool -P httpd_can_network_connect 1 || true
+fi
+
+# --- 6. Start everything -----------------------------------------------------
+systemctl daemon-reload
+systemctl enable --now neighborhood-eats
+
+nginx -t
+systemctl enable --now nginx
+systemctl reload nginx || systemctl restart nginx
+
+# --- 7. Did it work? ---------------------------------------------------------
+# Give gunicorn a moment, then ask the app the same question the load balancer
+# is about to ask it.
+for attempt in 1 2 3 4 5 6 7 8 9 10; do
+  if curl -fsS http://127.0.0.1/health; then
+    echo ""
+    echo "=== Setup finished successfully at $(date -u) ==="
+    exit 0
+  fi
+  echo "Health check not answering yet (attempt $attempt). Waiting..."
+  sleep 5
+done
+
+echo "=== The app did not come up. Useful next steps: ==="
+echo "  systemctl status neighborhood-eats"
+echo "  journalctl -u neighborhood-eats -n 50"
+exit 1
