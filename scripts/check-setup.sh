@@ -36,11 +36,17 @@ else
 fi
 
 if command -v terraform >/dev/null 2>&1; then
-  tf_version="$(terraform -version | head -n1 | sed -E 's/^Terraform v([0-9.]+).*/\1/')"
-  if version_at_least "$tf_version" "1.10.0"; then
-    ok "Terraform $tf_version"
+  # Prints "Terraform v1.10.0", or "OpenTofu v1.11.5" on machines that have
+  # OpenTofu instead. Either one runs this course, so read whichever it is.
+  tf_line="$(terraform -version | head -n1)"
+  tf_name="$(printf '%s\n' "$tf_line" | awk '{print $1}')"
+  tf_version="$(printf '%s\n' "$tf_line" | sed -E 's/^[A-Za-z]+ v([0-9]+(\.[0-9]+)*).*/\1/')"
+  if [ "$tf_version" = "$tf_line" ]; then
+    bad "Can't read a version number from '$tf_line'" "Check that 'terraform -version' works, then see docs/00-setup.md"
+  elif version_at_least "$tf_version" "1.10.0"; then
+    ok "$tf_name $tf_version"
   else
-    bad "Terraform $tf_version is too old (need 1.10 or newer)" "Re-run the Terraform install steps in docs/00-setup.md"
+    bad "$tf_name $tf_version is too old (need 1.10 or newer)" "Re-run the Terraform install steps in docs/00-setup.md"
   fi
 else
   bad "Terraform is not installed" "Follow the install steps in docs/00-setup.md"
