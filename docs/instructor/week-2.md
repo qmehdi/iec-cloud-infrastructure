@@ -67,7 +67,8 @@ Show `private.tf` and the `enable_nat` variable. It's the escape hatch for accou
 | `Backend configuration changed` | They have a `.terraform/` from the older S3 version of the course. `terraform init -migrate-state` pulls that state down to the laptop; `rm -rf .terraform` and a fresh `init` also works if they have nothing built. |
 | `Unable to find remote state` in Step 3 | Only bites from Week 3 on, when a folder reads an earlier one's state. Means they skipped a folder, or are running from the wrong directory. |
 | NAT gateway creation fails with an access error | Likely a new-style ("projects") account on the Free Plan. Pair them up and follow up after class. |
-| Can't see the VPC in the console | Region selector, top-right. Must be Oregon (us-west-2). |
+| Their account only allows one region | Some new accounts are pinned to a single region. Everything is parameterised, so have them `export AWS_REGION=<region> TF_VAR_region=<region>` (it's in `00-setup.md`), and run `COURSE_REGION=<region> ./scripts/check-setup.sh` so their profile matches. |
+| Can't see the VPC in the console | Region selector, top-right. Must match the region they built in (Oregon / us-west-2 by default). |
 | `Error acquiring the state lock` | A previous command was interrupted. Wait a minute and retry. If it persists: `terraform force-unlock <ID from the message>`. |
 
 ## If you're short on time

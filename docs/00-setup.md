@@ -73,11 +73,20 @@ cd iec-cloud-infrastructure
 aws login
 ```
 
-A browser window opens. Sign in the same way you sign in to the AWS console. When it says you're done, come back to the terminal. If it asks for a region, type `us-west-2`.
+A browser window opens. Sign in the same way you sign in to the AWS console. When it says you're done, come back to the terminal. If it asks for a region, type `us-west-2` (or your own, if your account is restricted — see the note below).
 
 > **No browser opened?** (Common in WSL.) Run `aws login --remote` instead. It prints a link: open it in your normal browser, sign in, then paste the code it shows back into the terminal.
 
 Your sign-in lasts up to 12 hours, which covers a whole class. Next week, just run `aws login` again.
+
+> **Is your AWS account locked to one region?** Some new accounts are. If yours can only use a different region (say `us-east-2`), set these two lines in every terminal you use for the course — or add them to your `~/.bashrc` or `~/.zshrc` so they're always there:
+>
+> ```bash
+> export AWS_REGION=us-east-2
+> export TF_VAR_region=us-east-2
+> ```
+>
+> Everything in the course follows those two. Wherever these notes say `us-west-2` or **Oregon**, read your own region instead. Let your instructor know too.
 
 ## Run the setup check
 

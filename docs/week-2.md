@@ -94,7 +94,7 @@ Read the plan, then type `yes`.
 - **Route table:** a list of directions. The rule "internet traffic goes through the internet gateway" is what makes these subnets public.
 - **Every folder keeps its own state.** The apply wrote a `terraform.tfstate` here, separate from the budget alarm's. That's why you can tear the network down and rebuild it without touching anything else.
 
-**Look around:** open **VPC** in the console (make sure the region in the top-right says **Oregon / us-west-2**):
+**Look around:** open **VPC** in the console (make sure the region in the top-right matches the one you built in — **Oregon / us-west-2** unless you set your own):
 
 - **Your VPCs** → `course-vpc`
 - **Subnets** → `course-public-a` and `course-public-b`. Notice they're in different availability zones.
@@ -175,5 +175,5 @@ On the **Cloud & DevOps Knowledge Pyramid**, that's the *Networking, Routing & S
 | `No valid credential sources found` or `ExpiredToken` | Your sign-in expired. Run `aws login`, then try again. |
 | `Backend configuration changed` | You ran this folder against the older S3 setup. Run `terraform init -migrate-state` to copy that state down to your laptop. |
 | `Unable to find remote state` | A later folder can't find an earlier one's state file. Apply them in order: `01-network` before `02-database` before `03-app`. |
-| Can't find your VPC in the console | Check the region in the top-right corner. It must be **Oregon (us-west-2)**. |
+| Can't find your VPC in the console | Check the region in the top-right corner. It must match the region you built in, **Oregon (us-west-2)** by default. |
 | `git checkout` says your changes would be overwritten | You edited a file. Run `git stash`, then try the checkout again. |

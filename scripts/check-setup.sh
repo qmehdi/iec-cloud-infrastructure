@@ -4,7 +4,10 @@
 
 set -uo pipefail
 
-COURSE_REGION="us-west-2"
+# The region the course builds in. Override it if your AWS account is
+# restricted to a different one:  COURSE_REGION=us-east-2 ./scripts/check-setup.sh
+if [ -n "${COURSE_REGION:-}" ]; then region_from_env=1; else region_from_env=0; fi
+COURSE_REGION="${COURSE_REGION:-us-west-2}"
 COURSE_PROFILE="course"
 LOGIN_PROFILE="${COURSE_LOGIN_PROFILE:-default}"
 
@@ -95,10 +98,19 @@ if [ "$aws_ok" -eq 1 ]; then
 
   region="$(aws configure get region --profile "$COURSE_PROFILE" 2>/dev/null || true)"
   if [ "$region" = "$COURSE_REGION" ]; then
-    ok "Region is $COURSE_REGION"
-  else
+    ok "Region is $region"
+  elif [ -z "$region" ] || [ "$region_from_env" -eq 1 ]; then
     aws configure set region "$COURSE_REGION" --profile "$COURSE_PROFILE"
-    ok "Region set to $COURSE_REGION (was '${region:-not set}')"
+    if [ -n "$region" ]; then
+      ok "Region set to $COURSE_REGION (was $region)"
+    else
+      ok "Region set to $COURSE_REGION"
+    fi
+  else
+    # Don't overwrite it. Some accounts can only use one region, and the
+    # student may have set this deliberately.
+    warn "Region is $region, not the course default ($COURSE_REGION)" \
+      "Fine if your account only allows $region. Run 'export AWS_REGION=$region TF_VAR_region=$region' so Terraform and the scripts use it too."
   fi
 fi
 
